@@ -8,6 +8,6 @@ namespace Appt.Scheduler
         public short PersonId { get; set; }
         public Person Person { get; set; }
         public DateTime Date { get; set; }
-        public short AppointmentType { get; set; }
+        public string AppointmentType { get; set; }
     }
 }

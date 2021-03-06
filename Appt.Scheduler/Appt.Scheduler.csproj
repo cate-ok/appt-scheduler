@@ -5,7 +5,28 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="ClientApp\src\model\Appointment.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="3.1.12" />
+    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.2.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Npgsql" Version="5.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ClientApp\build\" />
+    <Folder Include="ClientApp\public\images\" />
+    <Folder Include="ClientApp\src\components\ApptPage\" />
+    <Folder Include="ClientApp\src\components\NewApptPage\" />
+    <Folder Include="ClientApp\src\components\TimePicker\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\src\model\Appointment.ts" />
   </ItemGroup>
 
 

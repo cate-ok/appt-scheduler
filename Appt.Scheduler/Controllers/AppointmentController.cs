@@ -1,52 +1,53 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using Npgsql;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Globalization;
 
 namespace Appt.Scheduler.Controllers
 {
     [ApiController]
+    [Route("appointment")]
     public class AppointmentController : ControllerBase
     {
-        private readonly IConfiguration Configuration;
-
-        public AppointmentController(IConfiguration configuration)
+        private readonly IAppointmentRepository Repository;
+        public AppointmentController(IAppointmentRepository repository)
         {
-            Configuration = configuration;
+            Repository = repository;
         }
 
-        [Route("appointment")]
         [HttpGet]
         public IEnumerable<Appointment> Get()
         {
-            List<Appointment> appointments = new List<Appointment>();
-            string connectionString = Configuration["ConnectionString"];
-            NpgsqlConnection conn = new NpgsqlConnection(connectionString);
-            conn.Open();
-
-            var query = @"select a.id, a.date, a.time, t.name, a.person_id
-                        from appointment a
-                        inner
-                        join appointment_type t
-                        on a.type_id = t.id;";
-
-            NpgsqlCommand cmd = new NpgsqlCommand(query, conn);
-            NpgsqlDataReader dr = cmd.ExecuteReader();
-            // Read all rows and output the first column in each row
-            while (dr.Read())
-            {
-                appointments.Add(new Appointment()
-                {
-                    Id = (short)dr[0],
-                    //Date = DateTime.ParseExact(dr[1].ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture),
-                    AppointmentType = (short)dr[2],
-                    PersonId = (short)dr[3]
-                });
-            }
-            conn.Close();
+            var appointments = Repository.GetAppointments();
             return appointments;
         }
+
+        [HttpGet("{id}")]
+        public ActionResult<Appointment> Get(int id)
+        {
+            if (id == 0)
+                return BadRequest("Value must be passed in the request body.");
+            var appointment = Repository.GetAppointmentByID(id);
+            return Ok(appointment);
+        }
+
+        [HttpPost]
+        public void Post([FromBody] Appointment appt) => Repository.InsertAppointment(appt);
+
+        //[HttpPut]
+        //public Appointment Put([FromBody] Appointment appt) => Repository.UpdateAppointment(appt);
+
+        //[HttpPatch("{id}")]
+        //public StatusCodeResult Patch(int id, [FromBody] JsonPatchDocument<Appointment> patch)
+        //{
+        //    var appt = (Appointment)((OkObjectResult)Get(id).Result).Value;
+        //    if (appt != null)
+        //    {
+        //        patch.ApplyTo(appt);
+        //        return Ok();
+        //    }
+        //    return NotFound();
+        //}
+
+        [HttpDelete("{id}")]
+        public void Delete(int id) => Repository.DeleteAppointment(id);
     }
 }
